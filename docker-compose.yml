@@ -1,0 +1,43 @@
+
+version: '3.3'
+
+services:
+  plotly:
+    container_name: ui
+    image: analitica_descriptiva/ui
+    build:
+      context: .
+      dockerfile: Dockerfile.ui
+    volumes:
+     - ./app:/app
+    ports:
+      - "8050:8050"
+  mesajes:
+    container_name: proxy
+    image: analitica_descriptiva/proxy
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.proxy
+    volumes:
+     - ./app:/app
+    depends_on:
+      - rabbit
+  rabbit:
+    container_name: rabbit
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+      - "1883:1883"
+    networks:
+      default:
+        aliases:
+          - rabbit
+
+networks:
+  default:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/24
