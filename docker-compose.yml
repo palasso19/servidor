@@ -2,30 +2,34 @@
 version: '3.3'
 
 services:
-  plotly:
+  node:
     container_name: ui
-    image: analitica_descriptiva/ui
+    image: taller3/nodered
     build:
       context: .
-      dockerfile: Dockerfile.ui
+      dockerfile: Dockerfile.node
     volumes:
      - ./app:/app
     ports:
-      - "8050:8050"
-  mesajes:
-    container_name: proxy
-    image: analitica_descriptiva/proxy
+      - "1880:1880"
+  analitica:
+    container_name: analitica
+    image: taller3/analitica
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile.proxy
+      dockerfile: Dockerfile.analitica
     volumes:
      - ./app:/app
     depends_on:
       - rabbit
   rabbit:
     container_name: rabbit
-    image: rabbitmq:3-management
+    image: taller3/rabbit
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.rabbit
     ports:
       - "15672:15672"
       - "5672:5672"

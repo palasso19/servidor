@@ -1,33 +1,32 @@
 # example_consumer.py
-import pika, os, time, csv, time
+import pika, os, csv
+from analitica_modulo import analitica
 
 def save(data, file_name):
   with open(file_name, 'a', newline='') as file:
     writer = csv.writer(file, delimiter=',')
     writer.writerow(data)
 
-def process_function(msg):
+def process_function(msg, alalitica_servidor):
   file_name = "data/data_base.csv" 
   if not os.path.isfile(file_name):
     headers = ["","Date","sensor","value"]
     save(headers, file_name)
   print(" [x] Received " + str(msg))
   mesage = msg.decode("utf-8")
-  data = mesage.split("-")
-  save(data, file_name)
+  alalitica_servidor.update_data(mesage)
   return
 
 while 1:
-  time.sleep(5)
   url = os.environ.get('CLOUDAMQP_URL', 'amqp://guest:guest@rabbit:5672/%2f')
   params = pika.URLParameters(url)
   connection = pika.BlockingConnection(params)
   channel = connection.channel() # start a channel
   channel.queue_declare(queue='mensajes') # Declare a queue
-
+  alalitica_servidor = analitica()
   # create a function which is called on incoming messages
   def callback(ch, method, properties, body):
-    process_function(body)
+    process_function(body, alalitica_servidor)
 
   # set up subscription on the queue
   channel.basic_consume('mensajes',
