@@ -92,7 +92,6 @@ class analitica():
             time_format = datetime.utcfromtimestamp(tiempo)
             date_time = time_format.strftime('%d.%m.%Y %H:%M:%S')
             self.client.publish("predictiva/{}".format(sensor), "{},{},{}".format(date_time,sensor,prediccion[0]))
-            self.client.publish("predictiva/{}".format(sensor), "{},{},{}".format(date_time,sensor,prediccion[0]))           
 
     def guardar(self):
         self.df.to_csv(self.file_name, encoding='utf-8')
