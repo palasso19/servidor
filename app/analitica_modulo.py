@@ -17,7 +17,6 @@ class analitica():
 
     def __init__(self) -> None:
         self.load_data()
-    def mqtt_comunicacion(self):
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
@@ -74,10 +73,10 @@ class analitica():
         df_filtrado = df_filtrado.tail(self.ventana)
         df_filtrado['fecha'] = pd.to_datetime(df_filtrado.pop('fecha'), format='%d.%m.%Y %H:%M:%S')
         df_filtrado['segundos'] = [time.mktime(t.timetuple()) - 18000 for t in df_filtrado['fecha']]
-        tiempo = df_filtrado['segundos'].std(skipna = True, ddof=0)
-        if tiempo == 0.0:
+        tiempo = df_filtrado['segundos'].std(skipna = True)
+        if np.isnan(tiempo):
             return
-        tiempo = tiempo.astype(int)
+        tiempo = int(round(tiempo))
         ultimo_tiempo = df_filtrado['segundos'].iloc[-1]
         ultimo_tiempo = ultimo_tiempo.astype(int)
         range(ultimo_tiempo + tiempo,(self.pronostico + 1) * tiempo + ultimo_tiempo, tiempo)
