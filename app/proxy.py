@@ -8,11 +8,6 @@ def save(data, file_name):
     writer.writerow(data)
 
 def process_function(msg, alalitica_servidor):
-  file_name = "data/data_base.csv" 
-  if not os.path.isfile(file_name):
-    headers = ["","Date","sensor","value"]
-    save(headers, file_name)
-  print(" [x] Received " + str(msg))
   mesage = msg.decode("utf-8")
   alalitica_servidor.update_data(mesage)
   return
