@@ -4,10 +4,7 @@ import numpy as np
 import os
 from sklearn.linear_model import LinearRegression
 import time
-import paho.mqtt.client as mqtt
-import time
-from datetime import datetime
-
+import pika
 
 class analitica():
     ventana = 10
@@ -17,18 +14,6 @@ class analitica():
 
     def __init__(self) -> None:
         self.load_data()
-        self.client = mqtt.Client()
-        self.client.on_connect = self.on_connect
-        self.client.on_message = self.on_message
-        self.client.connect(self.servidor, 1883, 60)
-        self.client.loop_start()
-
-    def on_connect(client, userdata, flags, rc):
-        print("Connected with result code "+str(rc))
-        client.subscribe("$SYS/#")
-
-    def on_message(client, userdata, msg):
-        print(msg.topic + " " + str(msg.payload))
 
     def load_data(self):
 
@@ -56,13 +41,11 @@ class analitica():
         df_filtrado = self.df[self.df["sensor"] == sensor]
         df_filtrado = df_filtrado["valor"]
         df_filtrado = df_filtrado.tail(self.ventana)
-        now = datetime.now()
-        date_time = now.strftime('%d.%m.%Y %H:%M:%S')
-        self.client.publish("descriptiva/max-{}".format(sensor), "{},{},{}".format(date_time,sensor,df_filtrado.max(skipna = True)))
-        self.client.publish("descriptiva/min-{}".format(sensor), "{},{},{}".format(date_time,sensor,df_filtrado.min(skipna = True)))
-        self.client.publish("descriptiva/mean-{}".format(sensor), "{},{},{}".format(date_time,sensor,df_filtrado.mean(skipna = True)))
-        self.client.publish("descriptiva/median-{}".format(sensor), "{},{},{}".format(date_time,sensor,df_filtrado.median(skipna = True)))
-        self.client.publish("descriptiva/std-{}".format(sensor), "{},{},{}".format(date_time,sensor,df_filtrado.std(skipna = True)))
+        self.publicar("max-{}".format(sensor), str(df_filtrado.max(skipna = True)))
+        self.publicar("min-{}".format(sensor), str(df_filtrado.min(skipna = True)))
+        self.publicar("mean-{}".format(sensor), str(df_filtrado.mean(skipna = True)))
+        self.publicar("median-{}".format(sensor), str(df_filtrado.median(skipna = True)))
+        self.publicar("std-{}".format(sensor), str(df_filtrado.std(skipna = True)))
 
     def analitica_predictiva(self):
         self.regresion("temperatura")
@@ -90,7 +73,17 @@ class analitica():
         for tiempo, prediccion in zip(nuevos_tiempos, Y_pred):
             time_format = datetime.utcfromtimestamp(tiempo)
             date_time = time_format.strftime('%d.%m.%Y %H:%M:%S')
-            self.client.publish("predictiva/{}".format(sensor), "{},{},{}".format(date_time,sensor,prediccion[0]))
+            self.publicar("prediccion-{}".format(sensor), "{},{}".format(date_time,prediccion[0]))
+    @staticmethod
+    def publicar(cola, mensaje):
+        connexion = pika.BlockingConnection(pika.ConnectionParameters(host='rabbit'))
+        canal = connexion.channel()
+        # Declarar la cola
+        canal.queue_declare(queue=cola, durable=True)
+        # Publicar el mensaje
+        canal.basic_publish(exchange='', routing_key=cola, body=mensaje)
+        # Cerrar conexión
+        connexion.close()
 
     def guardar(self):
         self.df.to_csv(self.file_name, encoding='utf-8')
