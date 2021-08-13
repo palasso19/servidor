@@ -1,15 +1,14 @@
 # example_consumer.py
 import pika, os, csv
-from analitica_modulo import analitica
 
-def save(data, file_name):
-  with open(file_name, 'a', newline='') as file:
-    writer = csv.writer(file, delimiter=',')
-    writer.writerow(data)
 
-def process_function(msg, alalitica_servidor):
+def process_function(msg):
   mesage = msg.decode("utf-8")
-  alalitica_servidor.update_data(mesage)
+  print(mesage)
+  #Aqui va el codigo para enviar a la base de datos.
+  #
+  #
+  #
   return
 
 while 1:
@@ -18,10 +17,9 @@ while 1:
   connection = pika.BlockingConnection(params)
   channel = connection.channel() # start a channel
   channel.queue_declare(queue='mensajes') # Declare a queue
-  alalitica_servidor = analitica()
   # create a function which is called on incoming messages
   def callback(ch, method, properties, body):
-    process_function(body, alalitica_servidor)
+    process_function(body)
 
   # set up subscription on the queue
   channel.basic_consume('mensajes',

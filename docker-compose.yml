@@ -2,25 +2,25 @@
 version: '3.3'
 
 services:
-  node:
-    container_name: ui
-    image: taller3/nodered
-    build:
-      context: .
-      dockerfile: Dockerfile.node
+  database:
+    container_name: influxdb
+    image: influxdb
+    restart: always
     volumes:
-     - ./app:/app
+     -  /tmp/testdata/influx:/root/.influxdbv2
     ports:
-      - "1880:1880"
-  analitica:
-    container_name: analitica
-    image: taller3/analitica
+      - "8086:8086"
+  notepad:
+    container_name: notepad
+    image: taller3/notepad
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile.analitica
+      dockerfile: Dockerfile.python
     volumes:
      - ./app:/app
+    ports:
+      - "8888:8888"
     depends_on:
       - rabbit
   rabbit:
