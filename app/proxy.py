@@ -5,14 +5,13 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 from datetime import datetime
 
 my_bucket = os.environ.get('BUCKET')
-db_username = os.environ.get('DBUSERNAME')
-db_pass = os.environ.get('DBPASSWORD')
+db_token = os.environ.get('DBTOKEN')
 my_org = os.environ.get('ORG')
 rabbit_user = os.environ.get('RABBIT_USER')
 rabbit_password = os.environ.get('RABBIT_PASSWORD')
 
 
-client = InfluxDBClient(url="http://influxdb:8086", username=db_username, password=db_pass, org=my_org)
+client = InfluxDBClient(url="http://influxdb:8086", token=db_token, org=my_org)
 write_api = client.write_api(write_options=SYNCHRONOUS)
 query_api = client.query_api()
 
