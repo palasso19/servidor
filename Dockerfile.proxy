@@ -1,0 +1,10 @@
+FROM python:3.9
+
+WORKDIR /app
+
+ENV TZ=America/Bogota
+
+RUN pip install pika paho-mqtt
+RUN pip install influxdb influxdb-client
+COPY . /app
+CMD ["python", "proxy.py"]

@@ -1,20 +1,22 @@
 # Servidor.
 Demo, Taller de Servicios
+![plot](./Diagrama2-04.jpeg)
+## Uso, en bash
 
-## Uso, en el powershell
-### 1. Construir.
+## 1. llenar las credenciales
+ llenar el archivo credentials.env
+ 
+### 2. Construir.
 ```bash
 docker-compose build
 ```
 
-### 2. Ejecutar.
+### 3. Ejecutar.
 ```bash
 docker-compose up -d
 ```
-```bash
-docker exec -it influxdb influx setup
-```
-### 3. Detener.
+
+### 4. Detener.
 ```bash
 docker-compose down
 ```

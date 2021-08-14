@@ -14,15 +14,17 @@ services:
       default:
         aliases:
           - influxdb
-  notepad:
-    container_name: notepad
-    image: taller3/notepad
+  proxy:
+    container_name: proxy
+    image: taller3/proxy
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile.python
+      dockerfile: Dockerfile.proxy
+    env_file:
+      - ./credentials.env
     volumes:
-     - ./app:/app
+      - ./app:/app
     ports:
       - "8888:8888"
     depends_on:
