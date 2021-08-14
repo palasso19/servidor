@@ -10,6 +10,10 @@ services:
      -  /tmp/testdata/influx:/root/.influxdbv2
     ports:
       - "8086:8086"
+    networks:
+      default:
+        aliases:
+          - influxdb
   notepad:
     container_name: notepad
     image: taller3/notepad
