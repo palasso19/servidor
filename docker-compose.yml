@@ -2,10 +2,12 @@
 version: '3.3'
 
 services:
-  database:
+  influxdb:
     container_name: influxdb
     image: influxdb
     restart: always
+    env_file:
+      - ./credentials.env
     volumes:
      -  /tmp/testdata/influx:/root/.influxdbv2
     ports:
@@ -29,6 +31,8 @@ services:
       - "8888:8888"
     depends_on:
       - rabbit
+    links: 
+      - rabbit
   rabbit:
     container_name: rabbit
     image: taller3/rabbit
@@ -44,6 +48,11 @@ services:
       default:
         aliases:
           - rabbit
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://rabbit:15672"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 networks:
   default:
