@@ -1,6 +1,6 @@
 FROM  jupyter/datascience-notebook
 
-WORKDIR /app
+WORKDIR /app 
 
 ENV TZ=America/Bogota
 
