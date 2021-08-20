@@ -1,6 +1,7 @@
 # example_consumer.py
 import pika, os, csv
 
+# Ejemplo git remoto
 
 def process_function(msg):
   mesage = msg.decode("utf-8")
